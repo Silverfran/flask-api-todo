@@ -13,6 +13,7 @@ class Todo(db.Model):
 
     def serialize(self):
         return {
+            "id": self.id,
             "label": self.label,
             "user_name": self.user_name,
             "done": self.done

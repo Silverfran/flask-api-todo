@@ -34,19 +34,25 @@ def handle_hello(user_name):
     response_body = None
 
     if request.method == 'POST':
-        response_body = {
-            "hello": "world POST"
-        }
-    
+        body = request.get_json()
+        todo = Todo(user_name=body['user_name'], label=body['label'], done='false')
+        db.session.add(todo)
+        db.session.commit()
+        return jsonify("POST accepted"), 200
+
     if request.method == 'GET':
         all_todos = Todo.query.filter_by(user_name=user_name)
         all_todos = list(map(lambda x: x.serialize(), all_todos))
         response_body = all_todos
 
     if request.method == 'PUT':
-        response_body = {
-            "hello": "world PUT"
-        }
+        body = request.get_json()
+        todo = Todo.query.get(body['id'])
+        todo.user_name = body['user_name']
+        todo.label = body['label']
+        todo.done = body['done']
+        db.session.commit()
+        return jsonify("PUT accepted"), 200
 
     if request.method == 'DELETE':
         response_body = {
