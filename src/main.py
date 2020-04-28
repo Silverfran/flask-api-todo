@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from models import db
-#from models import Person
+from models import Todo
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -28,12 +28,30 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
-@app.route('/hello', methods=['POST', 'GET'])
-def handle_hello():
+@app.route('/todos/user/<user_name>', methods=['POST', 'GET', 'PUT', 'DELETE'])
+def handle_hello(user_name):
 
-    response_body = {
-        "hello": "world"
-    }
+    response_body = None
+
+    if request.method == 'POST':
+        response_body = {
+            "hello": "world POST"
+        }
+    
+    if request.method == 'GET':
+        all_todos = Todo.query.filter_by(user_name=user_name)
+        all_todos = list(map(lambda x: x.serialize(), all_todos))
+        response_body = all_todos
+
+    if request.method == 'PUT':
+        response_body = {
+            "hello": "world PUT"
+        }
+
+    if request.method == 'DELETE':
+        response_body = {
+            "hello": "world DELETE"
+        }
 
     return jsonify(response_body), 200
 
