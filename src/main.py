@@ -41,9 +41,14 @@ def handle_hello(user_name):
         return jsonify("POST accepted"), 200
 
     if request.method == 'GET':
-        all_todos = Todo.query.filter_by(user_name=user_name)
-        all_todos = list(map(lambda x: x.serialize(), all_todos))
-        response_body = all_todos
+        if user_name == 'all':
+            all_todos = Todo.query.all()
+            all_todos = list(map(lambda x: x.serialize(), all_todos))
+            response_body = all_todos
+        else:
+            all_todos = Todo.query.filter_by(user_name=user_name)
+            all_todos = list(map(lambda x: x.serialize(), all_todos))
+            response_body = all_todos
 
     if request.method == 'PUT':
         body = request.get_json()
@@ -55,9 +60,10 @@ def handle_hello(user_name):
         return jsonify("PUT accepted"), 200
 
     if request.method == 'DELETE':
-        response_body = {
-            "hello": "world DELETE"
-        }
+        body = request.get_json()
+        todo = Todo.query.filter_by(id=body['id']).delete()
+        db.session.commit()
+        return jsonify("User" + body['id']+  "deleted"), 200
 
     return jsonify(response_body), 200
 
